@@ -27,7 +27,7 @@ def https_get(url)
 end
 
 def has_notified?(device, value = nil)
-  file = 'has_notified.yml'
+  file = File.expand_path('../has_notified.yml', __FILE__)
 
   File.open(file, 'w') { |f| f.write({}.to_yaml) } unless File.exist?(file)
   data = YAML.load_file(file)
