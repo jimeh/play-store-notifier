@@ -1,6 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'uri'
+require 'cgi'
 require 'fileutils'
 require 'yaml'
 
@@ -43,13 +44,13 @@ DEVICES.each do |device, url|
   print "Checking #{device} availability... "
   body = https_get(url)
 
-  if body.index('We are out of inventory. Please check back soon.')
+  if !body.index('We are out of inventory. Please check back soon.')
     puts "AVAILABLE!"
 
     if !has_notified?(device)
       puts "Sending notification..."
       http_get("http://nexus4notifier.herokuapp.com/" +
-        "send_the_notification_email?device=#{device}")
+        "send_the_notification_email?device=#{CGI.escape(device)}")
     end
 
     has_notified?(device, true)
