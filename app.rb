@@ -19,11 +19,12 @@ get '/' do
 end
 
 get '/send_the_notification_email' do
+  device = params[:device]
   mail = Mail.new do
     from     ENV['FROM_EMAIL']
     to       ENV['TO_EMAIL']
-    subject  "#{params[:device]} NOW AVAILABLE!!"
-    body     "#{DEVICES[params[:device]]}"
+    subject  "#{device} NOW AVAILABLE!!"
+    body     "#{DEVICES[device]}"
   end
 
   mail.deliver!
