@@ -52,7 +52,7 @@ CONF[:devices].each do |device, url|
   if !body.index('We are out of inventory. Please check back soon.')
     puts "AVAILABLE!"
 
-    if !has_notified?
+    if !has_notified?(device)
       puts "Sending notification..."
       http_get("http://nexus4notifier.herokuapp.com/" +
         "send_the_notification_email?device=#{device}&url=#{url}")
