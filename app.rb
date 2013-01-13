@@ -18,10 +18,10 @@ end
 
 get '/send_the_notification_email' do
   mail = Mail.new do
-    from     'contact@jimeh.me'
-    to       'contact@jimeh.me'
-    subject  'Nexus 4 16GB NOW AVAILABLE!!'
-    body     'https://play.google.com/store/devices/details?id=nexus_4_16gb'
+    from     ENV['FROM_EMAIL']
+    to       ENV['TO_EMAIL']
+    subject  "#{params[:device]} NOW AVAILABLE!!"
+    body     "#{params[:url]}"
   end
 
   mail.deliver!
