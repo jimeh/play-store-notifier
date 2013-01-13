@@ -20,13 +20,18 @@ end
 
 get '/send_the_notification_email' do
   device = params[:device]
-  mail = Mail.new do
-    from     ENV['FROM_EMAIL']
-    to       ENV['TO_EMAIL']
-    subject  "#{device} NOW AVAILABLE!!"
-    body     "#{DEVICES[device]}"
+  if DEVICES[device]
+    mail = Mail.new do
+      from     ENV['FROM_EMAIL']
+      to       ENV['TO_EMAIL']
+      subject  "#{device} NOW AVAILABLE!!"
+      body     "#{DEVICES[device]}"
+    end
+
+    mail.deliver!
+    "Success!"
+  else
+    "Fail"
   end
 
-  mail.deliver!
-  "Success!"
 end
