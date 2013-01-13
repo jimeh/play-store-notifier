@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'mail'
 
+require './devices'
+
 Mail.defaults do
   delivery_method :smtp, {
     :address        => 'smtp.sendgrid.net',
@@ -21,7 +23,7 @@ get '/send_the_notification_email' do
     from     ENV['FROM_EMAIL']
     to       ENV['TO_EMAIL']
     subject  "#{params[:device]} NOW AVAILABLE!!"
-    body     "#{params[:url]}"
+    body     "#{DEVICES[params[:device]]}"
   end
 
   mail.deliver!

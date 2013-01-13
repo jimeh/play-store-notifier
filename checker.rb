@@ -4,13 +4,7 @@ require 'uri'
 require 'fileutils'
 require 'yaml'
 
-CONF = {
-  :has_notified_file => 'has_notified.yml',
-  :devices => {
-    'Nexus 4 (8GB)'  => 'https://play.google.com/store/devices/details?id=nexus_4_8gb',
-    'Nexus 4 (16GB)' => 'https://play.google.com/store/devices/details?id=nexus_4_16gb',
-  }
-}
+require './devices'
 
 def http_get(url)
   uri      = URI.parse(url)
@@ -32,7 +26,7 @@ def https_get(url)
 end
 
 def has_notified?(device, value = nil)
-  file = CONF[:has_notified_file]
+  file = 'has_notified.yml'
 
   File.open(file, 'w') { |f| f.write({}.to_yaml) } unless File.exist?(file)
   data = YAML.load_file(file)
@@ -45,17 +39,17 @@ def has_notified?(device, value = nil)
   end
 end
 
-CONF[:devices].each do |device, url|
+DEVICES.each do |device, url|
   print "Checking #{device} availability... "
   body = https_get(url)
 
-  if !body.index('We are out of inventory. Please check back soon.')
+  if body.index('We are out of inventory. Please check back soon.')
     puts "AVAILABLE!"
 
     if !has_notified?(device)
       puts "Sending notification..."
       http_get("http://nexus4notifier.herokuapp.com/" +
-        "send_the_notification_email?device=#{device}&url=#{url}")
+        "send_the_notification_email?device=#{device}")
     end
 
     has_notified?(device, true)
