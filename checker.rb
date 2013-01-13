@@ -41,14 +41,14 @@ def has_notified?(device, value = nil)
 end
 
 DEVICES.each do |device, url|
-  print "Checking #{device} availability... "
+  print "[#{Time.now}] Checking #{device} availability... "
   body = https_get(url)
 
   if !body.index('We are out of inventory. Please check back soon.')
     puts "AVAILABLE!"
 
     if !has_notified?(device)
-      puts "Sending notification..."
+      puts "[#{Time.now}] Sending notification..."
       http_get("http://nexus4notifier.herokuapp.com/" +
         "send_the_notification_email?device=#{CGI.escape(device)}")
     end
