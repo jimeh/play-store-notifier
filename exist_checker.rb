@@ -16,7 +16,7 @@ DEVICES['exist_check'].each do |device|
 
     has_notified?("exist", device, true)
   else
-    puts "DOES NOT EXIST! :("
+    puts "DOES NOT EXIST!"
     has_notified?("exist", device, false)
   end
 end
