@@ -4,7 +4,7 @@ DEVICES['stock_check'].each do |device, url|
   print "[#{Time.now}] Checking \"#{device}\" availability... "
   body = https_get(url)
 
-  if !body.index('We are out of inventory. Please check back soon.')
+  if !body.include?('We are out of inventory. Please check back soon.')
     puts "AVAILABLE!"
 
     if !has_notified?("stock", device)

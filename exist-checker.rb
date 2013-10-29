@@ -6,7 +6,7 @@ DEVICES['exist_check'].each do |device|
   print "[#{Time.now}] Checking \"#{device}\" device existance... "
   body = https_get(url)
 
-  if body.index(device)
+  if body.include?(device)
     puts "EXISTS!"
 
     if !has_notified?("exist", device)
