@@ -4,13 +4,15 @@ require 'uri'
 require 'cgi'
 require 'fileutils'
 require 'yaml'
+require 'mail'
 
-require './devices'
+#
+# Methods
+#
 
 def http_get(url)
   uri      = URI.parse(url)
   response = Net::HTTP.get_response(uri)
-
   response.body
 end
 
@@ -19,43 +21,40 @@ def https_get(url)
   http             = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl     = true
   http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
   request  = Net::HTTP::Get.new(uri.request_uri)
   response = http.request(request)
-
   response.body
 end
 
-def has_notified?(device, value = nil)
+def has_notified?(group, device, value = nil)
   file = File.expand_path('../has_notified.yml', __FILE__)
 
   File.open(file, 'w') { |f| f.write({}.to_yaml) } unless File.exist?(file)
   data = YAML.load_file(file)
+  data[group] ||= {}
 
   if !value.nil?
-    data[device] = value
+    data[group][device] = value
     File.open(file, 'w') { |f| f.write(data.to_yaml) }
   else
-    data[device]
+    data[group][device]
   end
 end
 
-DEVICES.each do |device, url|
-  print "[#{Time.now}] Checking #{device} availability... "
-  body = https_get(url)
-
-  if !body.index('We are out of inventory. Please check back soon.')
-    puts "AVAILABLE!"
-
-    if !has_notified?(device)
-      puts "[#{Time.now}] Sending notification..."
-      http_get("http://nexus4notifier.herokuapp.com/" +
-        "send_the_notification_email?device=#{CGI.escape(device)}")
-    end
-
-    has_notified?(device, true)
-  else
-    puts "NOT AVAILABLE"
-    has_notified?(device, false)
+def notify(sbj, bdy)
+  Mail.deliver do
+    from    CONFIG["from"]
+    to      CONFIG["to"]
+    subject sbj
+    body    bdy
   end
 end
+
+#
+# Config
+#
+
+CONFIG  = YAML.load_file File.expand_path("../config.yml", __FILE__)
+DEVICES = YAML.load_file File.expand_path("../devices.yml", __FILE__)
+
+Mail.defaults { delivery_method :smtp, CONFIG['smtp'] }
